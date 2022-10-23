@@ -7,3 +7,7 @@ Saves the data in postgresDB
 
 - python3
 - PostgresDB
+
+## TODO
+
+- scrapper_cont/nameGenerator.py gets names from file implement db Fetch

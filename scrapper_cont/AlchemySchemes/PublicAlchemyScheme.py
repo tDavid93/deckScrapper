@@ -9,7 +9,7 @@ metadata = Base.metadata
 class Deck(Base):
     __tablename__ = 'decks'
 
-    id = Column(Integer, primary_key=True, server_default=text("nextval('decks_id_seq'::regclass)"))
+    id = Column(Integer, primary_key=True)
     url = Column(Text)
     author = Column(Text)
     fetched = Column(Integer)

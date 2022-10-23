@@ -194,7 +194,7 @@ class scrapper():
         return
     with Session(this.engineP) as session:
     
-        session.execute("update decks Set fetched = 1 where id={0}".format(link[0]))
+        session.execute("update decks Set fetched = 1 where url={0}".format(link[0]))
         session.commit()
 
 

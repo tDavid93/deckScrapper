@@ -9,7 +9,9 @@ import psycopg2
 import re
 import difflib
 import pandas as pd
-
+from sqlalchemy import create_engine
+from sqlalchemy.orm import Session
+import numpy as np
 
 
 from concurrent.futures import thread
@@ -17,7 +19,10 @@ from concurrent.futures import thread
 
 class scrapper(this):
     
-
+  def __init__(self) -> None:
+      connectionString = 'postgresql://postgres:mtgai@localhost/decks'
+      engineP = create_engine(connectionString)
+      super().__init__()
 
 
   def searchForLinks(q ,deck_format="edh", price_min="", price_max="", update=""):
@@ -36,7 +41,7 @@ class scrapper(this):
       page = 1
       links = []
       while req_succes:
-          print(baseURL.format(p=page, page=page, q=q, deck_format=deck_format, price_min=price_min,price_max=price_max, update=update))
+          #print(baseURL.format(p=page, page=page, q=q, deck_format=deck_format, price_min=price_min,price_max=price_max, update=update))
           webp = requests.get(baseURL.format(p=page, page=page, q=q, deck_format=deck_format, price_min=price_min,price_max=price_max, update=update))
           if webp.status_code == 200:
               page += 1
@@ -171,25 +176,26 @@ class scrapper(this):
       return deck
 
 
-  def saveDeckToSql(url, deck, sqlConnector):
-      SQLcursor = sqlConnector.cursor()
-      SQLcursor.execute("SELECT * FROM deck_names WHERE name = %s", (url,))
-      dbCheck = SQLcursor.fetchone()
-      if dbCheck != []:
-          card_expanded = []
-          for card in deck:
-              while card[1] != 0:
-                  card_expanded.append(card[0])
-                  card[1] = card[1]-1
-          print(len(card_expanded))
-          if len(card_expanded) == 100:  
-              SQLcursor.execute('INSERT INTO decks ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99") VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id;', card_expanded )
-              sqlConnector.commit()
-              rowId = SQLcursor.fetchone()
-              SQLcursor.execute("INSERT INTO deck_names (deck_id, name, fetched) values (%s,%s,%s)", (rowId[0], url, 1))
-              sqlConnector.commit()
-      
-      SQLcursor.close()
+  def saveDeckToSql(connectionString,link,dfc,fetch_id ):
+
+    engine = create_engine(connectionString)
+    #print(dfc)
+    dfc = dfc.drop([ "Printing",  "Foil", "Alter", "Signed","Condition" , "Language" ], axis=1)
+    dfc =dfc.fillna(0)
+    dfc.loc[dfc["Commander"] != 0,"Commander"] = 1 
+    dfc["OracleId"] = np.nan
+    dfc["Name"] = dfc["Name"].str.replace("'"," ")
+    
+    tablename = "deck_{0}_{1}".format(link[0], fetch_id)
+    
+    try:
+        dfc.to_sql(tablename,engine,"decks")
+    except:
+        return
+    with Session(this.engineP) as session:
+    
+        session.execute("update decks Set fetched = 1 where id={0}".format(link[0]))
+        session.commit()
 
 
   def createDeckTables(sqlConnector):
@@ -248,3 +254,9 @@ class scrapper(this):
     result_n = pd.Series([""])
  
    return result_n.values[0]
+
+  def resolveCardOracleId(x, con):
+
+    response = con.execute("""SELECT "scryfallOracleId" FROM "CardData".printings order By similarity(name, '{0}') DESC LIMIT 1""".format(x))
+    data = response.first()[0]
+    return data

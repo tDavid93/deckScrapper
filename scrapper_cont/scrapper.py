@@ -20,7 +20,7 @@ from concurrent.futures import thread
 class scrapper():
     
   def __init__(self) -> None:
-      connectionString = 'postgresql://postgres:mtgai@host.docker.internal/decks'
+      connectionString = 'postgresql://postgres:mtgai@localhost/decks'
       engineP = create_engine(connectionString)
       super().__init__()
 

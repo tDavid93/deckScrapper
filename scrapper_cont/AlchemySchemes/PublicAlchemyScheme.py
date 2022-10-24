@@ -13,3 +13,4 @@ class Deck(Base):
     url = Column(Text)
     author = Column(Text)
     fetched = Column(Integer)
+    id_fetch = Column(Integer)

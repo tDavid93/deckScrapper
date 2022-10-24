@@ -63,7 +63,7 @@ class scrapper():
           resp = sqlCursor.fetchall()
           
           if resp == []:
-              sqlCursor.execute("INSERT INTO deck_names  (deck_id, name, fetched) values (%s,%s,%s);", (0,link,0))
+              sqlCursor.execute("INSERT INTO deck_names  (deck_id, name, fetched, id_fetch) values (%s,%s,%s,%s);", (0,link,0,0))
               sqlConnector.commit()
       sqlCursor.close()
 

@@ -27,6 +27,6 @@ for name in Lines:
   for l in links:
     exists = session.query(Deck).filter_by(url=l).first()
     if not exists:
-      deck.append(Deck(url=l,fetched=0,id_fech=0))
+      deck.append(Deck(url=l,fetched=0,id_fetch=0))
   session.add_all(deck)
   session.commit()

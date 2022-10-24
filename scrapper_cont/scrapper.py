@@ -186,7 +186,7 @@ class scrapper():
     dfc["OracleId"] = np.nan
     dfc["Name"] = dfc["Name"].str.replace("'"," ")
     
-    tablename = "deck_{0}_{1}".format(link[0], fetch_id)
+    tablename = "deck_{0}".format(fetch_id)
     
     try:
         dfc.to_sql(tablename,engine,"decks")

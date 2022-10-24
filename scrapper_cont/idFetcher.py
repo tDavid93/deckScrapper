@@ -2,6 +2,7 @@ counter = 0
 import pandas as pd
 from sqlalchemy import create_engine
 import scrapper as sc
+from sqlalchemy.orm import Session
 
 connectionString = 'postgresql://postgres:mtgai@host.docker.internal/decks'
 engineP = create_engine(connectionString)
@@ -30,7 +31,7 @@ while(True):
     
     deckTemp.to_sql("deck_{0}_{1}".format(table[1],table[0]),engineP,schema="deck_f",if_exists='replace')
     
-     with Session(this.engineP) as session:
-    
-        session.execute("update decks Set id_fetch = 1 where id={0}".format(table[0]))
-        session.commit()
+    with Session(engineP) as session:
+  
+      session.execute("update decks Set id_fetch = 1 where id={0}".format(table[0]))
+      session.commit()

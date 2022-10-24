@@ -42,7 +42,7 @@ while True:
     dDeck = rDeck.result()
     try:
      deckdf = pd.read_csv(StringIO(dDeck[0]))
-     sc.scrapper.saveDeckToSql(connectionString,dDeck[1],deckdf,fetch_id )
+     sc.scrapper.saveDeckToSql(connectionString,dDeck[1],deckdf,dDeck[1] )
      
     except:
      print("deckDownloader: FETCH ERROR")

@@ -13,7 +13,7 @@ COPY . .
 
 RUN chmod a+x run.sh
 
-RUN python createDBSchema.py
+#RUN python createDBSchema.py
 RUN python nameGenerator.py
 
 CMD ["./run.sh"]

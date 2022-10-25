@@ -21,12 +21,11 @@ while True:
  fetchLinks = np.array(fetchLinks)
 
  allLinkCount = len(fetchLinks)
- print("deckDownloader {0}".format(allLinkCount))
+ print("deckDownloader: {0}".format(allLinkCount))
  progress = 0
  threadCount = 50
  while len(fetchLinks) > 1:
 
-  #print("{prog}/{all} ::::: {len}".format(prog=progress,all=allLinkCount, len = len(fetchLinks)))
   if threadCount > len(fetchLinks):
    threadCount = len(fetchLinks)
 

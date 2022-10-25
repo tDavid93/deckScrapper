@@ -41,14 +41,14 @@ class scrapper():
       page = 1
       links = []
       while req_succes:
-          #print(baseURL.format(p=page, page=page, q=q, deck_format=deck_format, price_min=price_min,price_max=price_max, update=update))
+          ##print(baseURL.format(p=page, page=page, q=q, deck_format=deck_format, price_min=price_min,price_max=price_max, update=update))
           webp = requests.get(baseURL.format(p=page, page=page, q=q, deck_format=deck_format, price_min=price_min,price_max=price_max, update=update))
           if webp.status_code == 200:
               page += 1
               soup = BeautifulSoup(webp.content, "html.parser")
               h3 = soup.find_all("h3", class_="name deck-wide-header")
               for h in h3:
-                  print(h.find("a")["href"])
+                  #print(h.find("a")["href"])
                   links.append(h.find("a")["href"])
           else:
               req_succes = False
@@ -75,14 +75,14 @@ class scrapper():
       progress = 0
       for link in fetchLinks:
           progress = progress + 1
-          print("{prog}/{all}".format(prog=progress,all=allLinkCount))
+          #print("{prog}/{all}".format(prog=progress,all=allLinkCount))
           deck = this.parseDeckList(this.getDeckList(link[0]),sqlConnector)
           card_expanded = []
           for card in deck:
               while card[1] != 0:
                   card_expanded.append(card[0])
                   card[1] = card[1]-1
-          print(len(card_expanded))
+          #print(len(card_expanded))
           if len(card_expanded) == 100:  
               sqlCursor.execute('INSERT INTO decks ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99") VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id;', card_expanded )
               sqlConnector.commit()
@@ -102,7 +102,7 @@ class scrapper():
       threadCount = 20
       while len(fetchLinks) > 1:
       
-          print("{prog}/{all} ::::: {len}".format(prog=progress,all=allLinkCount, len = len(fetchLinks)))
+          ##print("{prog}/{all} ::::: {len}".format(prog=progress,all=allLinkCount, len = len(fetchLinks)))
           if threadCount > len(fetchLinks):
               threadCount = len(fetchLinks)
 
@@ -113,7 +113,7 @@ class scrapper():
               deckLists = []
               for link in threadLinks:
                   deckLists.append(executor.submit(this.getDeckListMultithread,link))
-          print("decklist: {lenght}".format( lenght=len(deckLists)))
+          ##print("decklist: {lenght}".format( lenght=len(deckLists)))
           for rDeck in concurrent.futures.as_completed(deckLists):
               dDeck = rDeck.result()
               deck = this.parseDeckList(dDeck[1],sqlConnector)        
@@ -122,7 +122,7 @@ class scrapper():
                   while card[1] != 0:
                       card_expanded.append(card[0])
                       card[1] = card[1]-1
-              print(len(card_expanded))
+              ##print(len(card_expanded))
               if len(card_expanded) == 100:  
                   sqlCursor.execute('INSERT INTO decks ("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23", "24", "25", "26", "27", "28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47", "48", "49", "50", "51", "52", "53", "54", "55", "56", "57", "58", "59", "60", "61", "62", "63", "64", "65", "66", "67", "68", "69", "70", "71", "72", "73", "74", "75", "76", "77", "78", "79", "80", "81", "82", "83", "84", "85", "86", "87", "88", "89", "90", "91", "92", "93", "94", "95", "96", "97", "98", "99") VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s) RETURNING id;', card_expanded )
                   sqlConnector.commit()
@@ -179,8 +179,8 @@ class scrapper():
   def saveDeckToSql(connectionString,link,dfc,fetch_id ):
 
     engine = create_engine(connectionString)
-    #print(dfc)
-    dfc = dfc.drop([ "Printing",  "Foil", "Alter", "Signed","Condition" , "Language" ], axis=1)
+    ##print(dfc)
+    dfc = dfc.drop([ "#printing",  "Foil", "Alter", "Signed","Condition" , "Language" ], axis=1)
     dfc =dfc.fillna(0)
     dfc.loc[dfc["Commander"] != 0,"Commander"] = 1 
     dfc["OracleId"] = np.nan
@@ -206,9 +206,9 @@ class scrapper():
       sqlConnector.commit()
       cur.close()
 
-  def createCardTable(sqlConnectordeck, sqlConnectorprints):
+  def createCardTable(sqlConnectordeck, sqlConnector#prints):
       dCur = sqlConnectordeck.cursor()
-      pCur = sqlConnectorprints.cursor()
+      pCur = sqlConnector#prints.cursor()
       unr = pCur.execute("SELECT DISTINCT name FROM cards ")
       uniquenames = unr.fetchall()
       uniquenames = list(map(lambda x: (this.clearName(x[0]),), uniquenames))
@@ -257,6 +257,6 @@ class scrapper():
 
   def resolveCardOracleId(x, con):
 
-    response = con.execute("""SELECT "scryfallOracleId" FROM "CardData".printings order By similarity(name, '{0}') DESC LIMIT 1""".format(x))
+    response = con.execute("""SELECT "scryfallOracleId" FROM "CardData".#printings order By similarity(name, '{0}') DESC LIMIT 1""".format(x))
     data = response.first()[0]
     return data
